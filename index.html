@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .app-container { max-width: 520px; width: 100%; text-align: center; }
+    .app-title {
+      font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem;
+      background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .app-subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .mood-question { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; color: #f1f5f9; }
+    .mood-buttons { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
+    .mood-btn {
+      width: 130px; height: 130px; border-radius: 20px; border: 2px solid #334155;
+      background: #1e293b; cursor: pointer; transition: all 0.3s;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+    }
+    .mood-btn:hover { transform: translateY(-5px); }
+    .mood-btn.happy { border-color: #34d399; }
+    .mood-btn.happy:hover { background: rgba(52,211,153,0.1); box-shadow: 0 0 20px rgba(52,211,153,0.2); }
+    .mood-btn.sad { border-color: #60a5fa; }
+    .mood-btn.sad:hover { background: rgba(96,165,250,0.1); box-shadow: 0 0 20px rgba(96,165,250,0.2); }
+    .mood-btn.frustrated { border-color: #fbbf24; }
+    .mood-btn.frustrated:hover { background: rgba(251,191,36,0.1); box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+    .mood-emoji { font-size: 2.2rem; }
+    .mood-label { font-size: 0.85rem; font-weight: 700; color: #cbd5e1; }
+    .result-area { display: none; margin-top: 1.5rem; }
+    .result-area.show { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .tabs { display: flex; gap: 0.4rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-btn {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid #334155;
+      background: transparent; color: #94a3b8; font-family: 'Tajawal', sans-serif;
+      font-size: 0.8rem; cursor: pointer; transition: all 0.3s;
+    }
+    .tab-btn.active { background: rgba(96,165,250,0.15); border-color: #60a5fa; color: #60a5fa; }
+    .tab-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+    .content-card {
+      background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+      padding: 1.2rem; margin-bottom: 0.8rem; text-align: right;
+    }
+    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.6rem; color: #f1f5f9; }
+    .card-text { font-size: 0.88rem; line-height: 1.9; color: #cbd5e1; }
+    .card-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 0.72rem; font-weight: 700; margin-bottom: 0.5rem;
+    }
+    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
+    .badge-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
+    .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .badge-pink { background: rgba(244,114,182,0.15); color: #f472b6; }
+    .quiz-option {
+      display: block; width: 100%; padding: 10px 16px; margin: 6px 0;
+      border: 1px solid #334155; border-radius: 10px; background: #0f172a;
+      color: #cbd5e1; font-family: 'Tajawal', sans-serif; font-size: 0.88rem;
+      cursor: pointer; transition: all 0.3s; text-align: right;
+    }
+    .quiz-option:hover { border-color: #60a5fa; }
+    .quiz-option.correct { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
+    .quiz-option.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; }
+    .quiz-score { font-size: 0.9rem; color: #60a5fa; margin-top: 0.5rem; font-weight: 700; }
+    .lang-word {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; margin: 4px 0; background: #0f172a; border-radius: 8px;
+      font-size: 0.88rem;
+    }
+    .lang-word .native { color: #60a5fa; font-weight: 700; }
+    .lang-word .meaning { color: #94a3b8; }
+    .back-btn {
+      margin-top: 1rem; padding: 8px 20px; border: 1px solid #334155;
+      border-radius: 10px; background: transparent; color: #94a3b8;
+      font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
+      cursor: pointer; transition: all 0.3s;
+    }
+    .back-btn:hover { border-color: #60a5fa; color: #60a5fa; }
+    .scroll-content { max-height: 60vh; overflow-y: auto; padding-left: 4px; }
+    .scroll-content::-webkit-scrollbar { width: 4px; }
+    .scroll-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="app-title">✨ مزاجك</div>
+    <div class="app-subtitle">اختر مزاجك الحين وخلنا نساعدك</div>
+
+    <div id="mainScreen">
+      <div class="mood-question">وش مزاجك الحين؟</div>
+      <div class="mood-buttons">
+        <button class="mood-btn happy" onclick="showMood('happy')">
+          <span class="mood-emoji">😊</span><span class="mood-label">سعيد</span>
+        </button>
+        <button class="mood-btn sad" onclick="showMood('sad')">
+          <span class="mood-emoji">😢</span><span class="mood-label">حزين</span>
+        </button>
+        <button class="mood-btn frustrated" onclick="showMood('frustrated')">
+          <span class="mood-emoji">😤</span><span class="mood-label">طفشان</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="resultArea" class="result-area">
+      <div class="tabs" id="tabsContainer"></div>
+      <div class="scroll-content" id="contentArea"></div>
+      <button class="back-btn" onclick="goBack()">↩ رجوع للقائمة الرئيسية</button>
+    </div>
+  </div>
+
+  <script>
+    const moodData = {
+      happy: {
+        tabs: ['قصص إسلامية', 'أحاديث ملهمة', 'نصائح إيجابية'],
+        sections: {
+          'قصص إسلامية': [
+            { badge:'badge-green', badgeText:'قصة تفاؤل', title:'🌟 قصة أبي هريرة والتفاؤل', text:`قال رسول الله ﷺ: "عجبا لأمر المؤمن إن أمره كله خير — إن أصابته سراء شكر فكان خيرا له، وإن أصابته ضراء صبر فكان خيرا له".\n\nكان أبو هريرة رضي الله عنه فقيرا جدا، ذات يوم جاء إلى النبي ﷺ وهو جائع. قال له النبي ﷺ: "يا أبا هريرة، ألا أدلك على شيء إذا فعلته غفر لك ذنبك؟" قال: بلى يا رسول الله. قال: "اغسل الوضوء بين الوضوءين".\n\nوهكذا كان النبي ﷺ يرفع هموم أصحابه بأبسط الكلمات. التفاؤل ليس تجاهل المشاكل — بل هو الثقة بأن الله يكتب في كل شي خيرا.` },
+            { badge:'badge-green', badgeText:'قصة شكر', title:'🌟 قصة عمر بن الخطاب والشكر', text:`ذات ليلة خرج عمر بن الخطاب رضي الله عنه يتفقد أهل المدينة، فسمع صوت امرأة تقول لطفلها:\n\n"نامي يا بني، فإن أمير المؤمنين عمر قد أقام الليل يصلّي". فبكى عمر وقال: "يا رب، هل أنا أهون عندك من هذه المرأة التي تشفي صدرها بك؟"\n\nثم عاد إلى بيته ونام قليلا ثم استيقظ وصلّى. هذا الشكر والتواضع جعل عمر من أعظم القادة في التاريخ.\n\n💡 الدرس: الشكر يزيد البركة، والتواضع يفتح أبواب الرحمة.` },
+            { badge:'badge-green', badgeText:'قصة ثقة بالله', title:'🌟 قصة الصحابي الذي وثق بربه', text:`كان رجل من الأنصار فقيرا، لم يكن عنده إلا تمرة واحدة. جاءه جاراه يطلبان شيئا يأكلانه. أعطاهم التمرة وانصرف جائعا.\n\nفلما دخل بيته وجد الله قد أرسل له هدية من طعام. قال: "هذا من فضل ربي".\n\nالنبي ﷺ سمع بالقصة وقال: "من ترك شيئا لله عوضه الله خيرا منه".\n\n💡 الدرس: عندما تتوكل على الله وتترك الدنيا طمعا في رضاه، يأتيك الخير من حيث لا تحتسب.` },
+            { badge:'badge-green', badgeText:'قصة صبر', title:'🌟 قصة جابر بن عبد الله والصبر', text:`ذات يوم قتل والد جابر بن عبد الله رضي الله عنه في غزوة أحد. ذهب جابر إلى النبي ﷺ يبكي. فأخذه النبي ﷺ بحنان وقال: "إن الله يحب أن تُستعمل آياته عند الكرب".\n\nعلمه النبي ﷺ كيف يصلي على والده وكيف يستغفر له. وبمرور الوقت، أصبح جابر من أكثر الصحابة علما وحكمة.\n\n💡 الدرس: الألم المؤقت يصنع شخصيات قوية تدوم للأبد.` },
+            { badge:'badge-green', badgeText:'قصة أمل', title:'🌟 قصة يوسف عليه السلام والأمل', text:`أُلقي سيدنا يوسف عليه السلام في البئر وهو طفل صغير، ثم بيع عبداً، ثم سُجن ظلماً لسنوات. لكن في كل مرحلة كان يقول لنفسه: "ربّي أعلم بما يفعلون".\n\nوفي النهاية، أصبح عزيز مصر — أقوى رجل في البلاد. لم يكن حظاً، بل كان ثباتاً على الأمل والصبر.\n\n💡 الدرس: لا تحكم على وضعك الحالي بأنه نهايتك — ربما هو بداية أعظم رحلة.` },
+            { badge:'badge-green', badgeText:'قصة ابتسامة', title:'🌟 قصة سعد بن معاذ والابتسامة', text:`كان سعد بن معاذ رضي الله عنه رجلاً شجاعاً ومبتسماً. ذات يوم دخل على النبي ﷺ والنبي ﷺ يبتسم. قال سعد: "يا رسول الله، ما أبشرك وجهك اليوم؟" قال: "جاءني جبريل يخبرني أنك ستدخل الجنة".\n\nفقال سعد: "فهل لي أن أضحك؟" فضحك النبي ﷺ وضحك الصحابة جميعاً.\n\n💡 الدرس: الابتسامة صدقة، والفرح الصادق يعدي الآخرين بالسعادة.` },
+            { badge:'badge-green', badgeText:'قصة كرم', title:'🌟 قصة بلال بن رباح والكرم', text:`كان بلال بن رباح رضي الله عنه مملوكاً يُعذب على دينه. لكنه لم يفقد أماله أبداً. كان يردد "أحد أحد" رغم الضرب.\n\nحتى اشتراه أبو بكر الصديق وأعتقه. ثم أصبح مؤذن الإسلام الأول.\n\nصوت بلال في الفجر كان يحمل رسالة: "الله أكبر" — يعني الله فوق كل شيء.\n\n💡 الدرس: الكرامة الحقيقية ليست في المكانة الاجتماعية — بل في الثبات على الحق.` },
+            { badge:'badge-green', badgeText:'قصة توبة', title:'🌟 قصة مالك بن دينار والتوبة', text:`كان مالك بن دينار شاباً يضيع وقته في اللهو واللعب. ذات يوم رأى رجلاً صالحاً يصلي في مسجد مهجور. تأثر قلبه وبدأ يسأل نفسه: "هل حياتي كلها ستكون هكذا؟"\n\nتوبته كانت صادقة، وأصبح من أعظم العباد في عصره. كتب عنه الناس مئات القصص.\n\n💡 الدرس: لا يوجد وقت متأخر للتغيير. لحظة واحدة من الصدق تكفي لتحويل مسار حياتك.` },
+            { badge:'badge-green', badgeText:'قصة حب', title:'🌟 قصة عائشة وأم سلمة والحب', text:`كانت عائشة وأم سلمة رضي الله عنهما من أفضل النساء في التاريخ. رغم اختلاف شخصيتهما، كنّ يتحاببن ويتعاونن.\n\nعائشة كانت حريصة على العلم، وأم سلمة كانت حريصة على الحكمة. كل واحدة تعلمت من الأخرى.\n\n💡 الدرس: الحب الحقيقي لا يحتاج تشابه تام — يكفي الاحترام المتبادل والرغبة في التعلم من بعضنا.` },
+            { badge:'badge-green', badgeText:'قصة نجاح', title:'🌟 قصة خالد بن الوليد والنجاح', text:`كان خالد بن الوليد رضي الله عنه من أعظم القادة العسكريين في التاريخ. لم يخسر معركة واحدة في حياته!\n\nلكن سر نجاحه لم يكن القوة فقط — كان التخطيط والذكاء والثقة بالله.\n\nقبل كل معركة كان يقول: "لا قوة إلا بالله". وكان يخطط بعناية فائقة.\n\n💡 الدرس: النجاح = تخطيط + عمل + توكل على الله.` }
+          ],
+          'أحاديث ملهمة': [
+            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث التفاؤل', text:`قال رسول الله ﷺ: "لا يحل لمسلم أن يهجر أخاه فوق ثلاث ليال، يلتقيان فيعرض هذا ويعرض هذا، وخيرهما الذي يبدأ بالسلام".\n\nالتفاؤل يبدأ من علاقاتنا مع الناس. ابدأ بالسلام، ابتسم، كن أول من يقدم — ستجد أن السعادة تنتقل كالعدوى الإيجابية.` },
+            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث الرضا', text:`قال رسول الله ﷺ: "إن العجب لعبد يشقى بنفسه، يقول: لو عملت كذا وكذا لكان كذا وكذا. أما إنه ما أصابك لم يكن ليخطئك، وما أخطأك لم يكن ليصيبك".\n\nالرضا بقضاء الله ليس استسلاماً — بل هو ثقة عميقة بأن الله أعلم بما يصلحنا.` },
+            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث البشارة', text:`قال رسول الله ﷺ: "إذا مات ابن آدم انقطع عمله إلا من ثلاث: صدقة جارية، أو علم ينتفع به، أو ولد صالح يدعو له".\n\nهذه البشارة تذكرنا أن أثرنا يستمر بعد رحيلنا. كل عمل صالح اليوم يبني مستقبلاً سعيداً.` }
+          ],
+          'نصائح إيجابية': [
+            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: قوة الامتنان', text:`📌 جرّب هذا اليوم:\n• اكتب 3 أشياء تشعر بالامتنان لها\n• قل الحمد لله بصوت عالٍ لكل واحدة\n• لاحظ كيف يتغير مزاجك خلال 10 دقائق\n\nالأبحاث العلمية أثبتت أن ممارسة الامتنان يومياً تزيد السعادة بنسبة 25%. والدين الإسلامي يعلمنا هذا منذ 1400 سنة!` },
+            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: قانون الـ 5 ثواني', text:`📌 قبل ما تفكر كثير في شي سلبي:\n• عد تنازلياً: 5... 4... 3... 2... 1...\n• بعدها افعل أول شي إيجابي يخطر ببالك\n• مثل: ابتسم، اشرب ماء، اقرأ آية قرآنية\n\nهذا يكسر دائرة التفكير السلبي فوراً!` },
+            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: بيئة السعادة', text:`📌 حوّل محيطك:\n• ضع صورة تحفزك بجوار سريرك\n• احذف حسابات تسبب لك قلقاً\n• أضف شخصيات إيجابية في حياتك\n• اقرأ صفحة من القرآن كل صباح\n\nالسعادة تبدأ من البيئة اللي حولك.` }
+          ]
+        }
+      },
+      sad: {
+        tabs: ['قصص مسلية', 'رسائل محفزة', 'تمارين سريعة'],
+        sections: {
+          'قصص مسلية': [
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 أبو الدرداء وزوجته', text:`كان أبو الدرداء رضي الله عنه يحب العلم كثيراً. ذات ليلة كان يدرس حتى السحر، فجاءه جاره وقال: "يا أبا الدرداء، كم ساعة تقرأ؟!" فقال: "أنا أحب أن أكون مع الله".\n\nثم قال الجار: "لكن زوجتك تحبك أكثر!". فعاد أبو الدرداء لزوجته أم سلمة... لا، أم الدرداء! 😄\n\nوالحق إن هذه القصة تذكرنا بأن التوازن بين العبادة والراحة مهم. لا تنسى تضحك وتسامر عائلتك بعد المذاكرة!` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الحكيم والمجنون', text:`دخل مجنون على ملك فقال: "يا ملك، أنت تملك الأرض لكن لا تملك النوم". قال الملك: "وماذا تريد؟" قال: "أريد أن تعرف أنك مهما جمعت من ذهب، لن يشتري لك ليلة نوم هانئة بدون رضا الله".\n\nثم ضحك المجنون وقال: "وأنا أعيش بسدفة وأنام أفضل منك!"\n\n💡 الحقيقة: السعادة ليست في الكمالية — بل في القناعة والرضا.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الصحابي والفيل', text:`ذات يوم مرّ فيل أمام الصحابة فسأل أحدهم النبي ﷺ: "يا رسول الله، أي الحيوان أقوى؟" قال: "الفيل". قال: "وأيهم أذكى؟" قال: "الإنسان".\n\nفقال الصحابي: "يا رسول الله، لماذا الفيل أقوى وأنا أذكى؟" فأجاب النبي ﷺ بابتسامة: "لأن الله خلق كل شي بحكمة، والقوة بدون عقل خطر، والعقل بدون قوة محدود".\n\n💡 الدرس: كل واحد منا عنده نقاط قوة مختلفة — لا تقارن نفسك بالآخرين!` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الرجل والحمار', text:`كان هناك رجل يمشي في الصحراء معه حماره. مرّ عليهم رجل آخر وقال: "ما أجمل هذا الحمار!" فقال صاحبه: "الحمد لله".\n\nبعد أيام، اختلس الحمار. قال الرجل: "الحمد لله". قال جاره: "كيف الحمد لله وقد فقدت حمارك؟" قال: "ربما كان سيصيبه مكروه وأنا كنت سأتحمل ألم ذلك".\n\nبعد أيام عاد الحمار مع ثلاثة أخرى! قال الرجل: "الحمد لله".\n\n💡 الدرس: لا تدري أيّ يوم خير لك — الحمد لله في كل حال.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 القاضي والسؤال الصعب', text:`دخل رجل على قاضي المدينة وقال: "يا قاضي، هل يمكن أن يكون الإنسان صادقاً وكذاباً في نفس الوقت؟"\n\nفكر القاضي طويلاً ثم قال: "نعم! عندما يقول لصاحبه: أنا كذاب".\n\nفضحك الجميع وقال الرجل: "أنت أذكى مما ظننت!"\n\n💡 الدرس: الفكاهة الذكية تخفف التوتر وتفتح الأبواب المغلقة.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الطفل والخبز', text:`ذات يوم جاء طفل صغير إلى متجر الخبز وسأل: "كم سعر هذا الخبز؟" قال البائع: "ريال واحد". قال الطفل: "أعطيني خبزاً بـ 50 هللة".\n\nاستغرب البائع وقال: "كيف؟" قال الطفل: "لأن أمي قالت لي: لا تنفق أكثر من نصف ريال".\n\nضحك البائع وأعطاؤه الخبز مجاناً وقال: "خذوه مجاناً لأن ذكاءكم يستحق الهدايا".\n\n💡 الدرس: البساطة والبراءة أحياناً تكون أذكى من الحسابات المعقدة.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 المعلم والطالب', text:`سأل طالب معلّمه: "يا أستاذ، كيف أتذكر كل شي أتعلمه؟" قال المعلم: "اكتبه". قال الطالب: "ماذا لو نسيت الكتابة؟" قال المعلم: "اكتب: نسيت الكتابة".\n\nضحك الجميع، لكن الفكرة حقيقية: الكتابة تساعد الذاكرة بشكل كبير!\n\n💡 الدرس: أبسط الطرق هي الأكثر فعالية. لا تعقّد الأمور.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الرجل والظل', text:`كان رجل يشتكي من ظله: "يا ظلي، ليش تتبعني أينما ذهبت؟" ثم فكر وقال: "لكن لو ما كنت موجود، لما عرفني أحد من بعيد!"\n\nضحك لنفسه واستراح.\n\n💡 الدرس: الأشياء اللي نشكو منها أحياناً هي نفسها اللي نحتاجها. حاول تشوف الجانب الآخر.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الصحابي والتميمة', text:`جاء رجل للنبي ﷺ وقال: "يا رسول الله، عندي تميمة أحمي بها نفسي". قال النبي ﷺ: "التمائم تضر ولا تنفع. اعوذ بكلمات الله التامات من شر ما خلق".\n\nفقال الرجل: "يا رسول الله، فماذا أفعل؟" قال: "اقرأ سورة الفلق والناس كل ليلة".\n\nفقال الرجل: "هل تكفي؟" قال: "نعم، فهي كافية لمن وثق بالله".\n\n💡 الدرس: الثقة بالله أقوى من أي حماية بشرية.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 التاجر الفقير', text:`كان تاجر فقير يبيع خبزاً في السوق. ذات يوم جاءه غريب وقال: "يا أخي، أعطني رغيفاً". أعطاه التاجر آخر رغيف عنده.\n\nبعد شهر، جاء الغريب مرة ثانية وقال: "أنا من تجار الشام، سألتك عن رغيف واحد واختبرت قلبك. الآن أريد أن أكون شريكك في التجارة".\n\nوبالفعل أصبحا شركاء ونجحوا.\n\n💡 الدرس: الكرم في أصغر الأمور يفتح أبواباً كبيرة.` },
+            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الحكاية الطويلة', text:`قال رجل لصديقه: "أعرف حكاية طويلة جداً!" قال الصديق: "أخبرني". قال: "الحكاية هي أنني قلت لك إنها طويلة جداً!".\n\nضحك الاثنان وقال الصديق: "أفضل حكاية قصيرة ومفيدة".\n\n💡 الدرس: الإيجاز فن. لا تطوّل الكلام بدون فائدة.` }
+          ],
+          'رسائل محفزة': [
+            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة لك', text:`🌹 تذكر:\n• كل مشكلة في حياتك هي درس وليس عقوبة\n• الله لا يضع فوق طاقتك\n• الصبر مفتاح الفرج — وهذا وعد من الله\n• كل يوم جديد فرصة جديدة\n\n"فإِنَّ مَعَ الْعُسْرِ يُسْرًا" — سورة الشرح\n\nأنت أقوى مما تعتقد 💪` },
+            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة أمل', text:`🌹 اقرأ هذه الآية 3 مرات بصوت عالٍ:\n\n"وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ"\n— سورة الضحى\n\nهذه الآية نزلت في أصعب لحظة في حياة النبي ﷺ. وإذا كانت للنبي ﷺ، فهي لك أيضاً.\n\nالله وعدك بالرضا — ثق بوعد الله 🤲` },
+            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة شجاعة', text:`🌹 تذكر هذه الحقائق:\n• ٩٩٪ من الناس يمرون بمواقف صعبة — أنت لست وحدك\n• الألم مؤقت لكن القوة اللي تبنيها دائمة\n• كل خطوة صغيرة نحو الأمام هي انتصار\n• الله مع الصابرين — وهذا وعد مؤكد\n\nخذ نفس عميق... الآن... أنت بخير 🌿` }
+          ],
+          'تمارين سريعة': [
+            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين التنفس العميق', text:`📌 جرّب الحين:\n1. خذ نفس عميق من أنفك (عد 4 ثواني)\n2. احبس النفس (عد 4 ثواني)\n3. زفر ببطء من فمك (عد 6 ثواني)\n4. كرّر 5 مرات\n\nهذا يقلل هرمون التوتر فوراً ويهدئ الأعصاب. جرّبه الحين! 🌬️` },
+            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين الامتنان السريع', text:`📌 اكتب بسرعة (حتى 3 أشياء):\n• شيء جميل صار لك اليوم\n• شخص تحبه ويشجعك\n• شيء تتطلع له في الأسبوع الجاي\n\nكتابة الامتنان تنشط مناطق السعادة في الدماغ! ✍️` },
+            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين الحركة', text:`📌 قف الحين وافعل:\n• امشِ 5 دقائق في الهواء الطلق\n• تمدد جسمك (ارفع يديك للأعلى)\n• اشرب كوب ماء بارد\n• ابتسم حتى لو مجبر — الابتسامة تخدع الدماغ بأنه سعيد!\n\nالحركة البدنية = مضاد اكتئاب طبيعي 🏃‍♂️` }
+          ]
+        }
+      },
+      frustrated: {
+        tabs: ['لعبة معلومات', 'تعلم لغات', 'نصائح عملية'],
+        sections: {
+          'لعبة معلومات': [
+            { badge:'badge-yellow', badgeText:'لعبة تفاعلية', title:'🎮 اختبار معلومات عامة', isQuiz:true, questions:[
+              { q:'ما هي عاصمة السعودية؟', options:['جدة','الرياض','مكة','الدمام'], correct:1 },
+              { q:'كم عدد سور القرآن الكريم؟', options:['100','110','114','120'], correct:2 },
+              { q:'ما هو أكبر كوكب في المجموعة الشمسية؟', options:['زحل','المشتري','أورانوس','نبتون'], correct:1 },
+              { q:'من هو أول خليفة في الإسلام؟', options:['عمر بن الخطاب','علي بن أبي طالب','أبو بكر الصديق','عثمان بن عفان'], correct:2 },
+              { q:'ما هي أطول سورة في القرآن؟', options:['البقرة','آل عمران','النساء','المائدة'], correct:0 }
+            ]}
+          ],
+          'تعلم لغات': [
+            { badge:'badge-green', badgeText:'🇬🇧 إنجليزي', title:'🇬🇧 5 كلمات إنجليزية مفيدة', text:`<div class="lang-word"><span class="native">Hello</span><span class="meaning">مرحبا</span></div><div class="lang-word"><span class="native">Thank you</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Please</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">I love you</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">Good luck</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 حفظ 5 كلمات يومياً = 1825 كلمة في السنة!</p>` },
+            { badge:'badge-green', badgeText:'🇪🇸 إسباني', title:'🇪🇸 5 كلمات إسبانية مفيدة', text:`<div class="lang-word"><span class="native">Hola</span><span class="meaning">مرحبا</span></div><div class="lang-word"><span class="native">Gracias</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Por favor</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">Te quiero</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">Buena suerte</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 الإسبانية ثاني لغة عالمية — تعلمها يفتح لك فرص كثيرة!</p>` },
+            { badge:'badge-green', badgeText:'🇮🇹 إيطالي', title:'🇮🇹 5 كلمات إيطالية مفيدة', text:`<div class="lang-word"><span class="native">Ciao</span><span class="meaning">مرحبا / وداعاً</span></div><div class="lang-word"><span class="native">Grazie</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Per favore</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">Ti amo</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">In bocca al lupo</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 الإيطالي لغة الفن والموسيقى والطبخ — جميلة جداً!</p>` }
+          ],
+          'نصائح عملية': [
+            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: تحويل الغضب لإنتاج', text:`📌 بدل ما تكون طفشان، حوّل الطاقة:\n• اكتب كل شي يزعجك في ورقة → ثم ارمها\n• افعل تمرين بدني سريع (10 ضغطات)\n• حدد هدف صغير تحققه اليوم\n• اقرأ سورة الإخلاص 3 مرات\n\nالغضب طاقة — المشكلة لما نتركها بدون توجيه. وجهها لشي مفيد!` },
+            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: قاعدة الـ 2 دقيقة', text:`📌 إذا شعرت بالإحباط من مهمة كبيرة:\n• اسأل نفسك: "هل أقدر أفعل جزء منها في دقيقتين؟"\n• لو نعم → ابدأ فوراً\n• غالباً ستكمل أكثر من دقيقتين لأن البداية هي الأصعب\n\nمثال: بدل "أحتاج أكتب تقرير كامل" → "أكتب جملة واحدة فقط"\n\nالبداية الصغيرة تكسر حاجز الخمول! 🚀` },
+            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: تقنية POMODORO', text:`📌 طريقة العمل الذكية:\n• اعمل 25 دقيقة بتركيز كامل\n• استرح 5 دقائق\n• كرّر 4 مرات\n• خذ استراحة طويلة 15-30 دقيقة\n\nهذه الطريقة تستخدمها الشركات الكبرى. جربها اليوم وشوف الفرق! ⏱️` }
+          ]
+        }
+      }
+    };
+
+    let currentMood = '';
+    let currentTab = 0;
+    let quizScore = 0;
+    let quizAnswered = [];
+
+    function showMood(mood) {
+      currentMood = mood;
+      currentTab = 0;
+      quizScore = 0;
+      quizAnswered = [];
+      document.getElementById('mainScreen').style.display = 'none';
+      const area = document.getElementById('resultArea');
+      area.classList.add('show');
+      renderTabs();
+      renderContent();
+    }
+
+    function renderTabs() {
+      const container = document.getElementById('tabsContainer');
+      const tabs = moodData[currentMood].tabs;
+      container.innerHTML = tabs.map((tab, i) =>
+        `<button class="tab-btn ${i === currentTab ? 'active' : ''}" onclick="switchTab(${i})">${tab}</button>`
+      ).join('');
+    }
+
+    function switchTab(idx) {
+      currentTab = idx;
+      quizScore = 0;
+      quizAnswered = [];
+      renderTabs();
+      renderContent();
+    }
+
+    function renderContent() {
+      const area = document.getElementById('contentArea');
+      const tabs = moodData[currentMood].tabs;
+      const sectionName = tabs[currentTab];
+      const items = moodData[currentMood].sections[sectionName];
+
+      let html = '';
+      items.forEach(item => {
+        if (item.isQuiz) {
+          html += renderQuiz(item);
+        } else {
+          html += `
+            <div class="content-card">
+              <span class="card-badge ${item.badge}">${item.badgeText}</span>
+              <div class="card-title">${item.title}</div>
+              <div class="card-text">${item.text.replace(/\n/g, '<br>')}</div>
+            </div>`;
+        }
+      });
+      area.innerHTML = html;
+    }
+
+    function renderQuiz(item) {
+      let html = `<div class="content-card">
+        <span class="card-badge ${item.badge}">${item.badgeText}</span>
+        <div class="card-title">${item.title}</div>
+        <div class="quiz-score" id="quizScore">النتيجة: 0 / ${item.questions.length}</div>`;
+
+      item.questions.forEach((q, qi) => {
+        html += `<div style="margin-top:12px" id="q-${qi}">
+          <div style="font-size:0.9rem;font-weight:700;margin-bottom:6px;color:#f1f5f9">${qi + 1}. ${q.q}</div>`;
+        q.options.forEach((opt, oi) => {
+          html += `<button class="quiz-option" id="opt-${qi}-${oi}" onclick="checkAnswer(${qi}, ${oi}, ${q.correct})">${opt}</button>`;
+        });
+        html += `</div>`;
+      });
+
+      html += `</div>`;
+      return html;
+    }
+
+    function checkAnswer(qi, selected, correct) {
+      if (quizAnswered.includes(qi)) return;
+      quizAnswered.push(qi);
+
+      const selectedBtn = document.getElementById(`opt-${qi}-${selected}`);
+      const correctBtn = document.getElementById(`opt-${qi}-${correct}`);
+
+      if (selected === correct) {
+        selectedBtn.classList.add('correct');
+        quizScore++;
+      } else {
+        selectedBtn.classList.add('wrong');
+        correctBtn.classList.add('correct');
+      }
+
+      const options = document.querySelectorAll(`[id^="opt-${qi}-"]`);
+      options.forEach(btn => btn.style.pointerEvents = 'none');
+
+      document.getElementById('quizScore').textContent = `النتيجة: ${quizScore} / ${document.querySelectorAll('.quiz-option').length / 5}`;
+    }
+
+    function goBack() {
+      document.getElementById('mainScreen').style.display = 'block';
+      document.getElementById('resultArea').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

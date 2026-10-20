@@ -1,309 +1,757 @@
 
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: 'Tajawal', sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      color: #e2e8f0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
-    .app-container { max-width: 520px; width: 100%; text-align: center; }
-    .app-title {
-      font-size: 1.6rem; font-weight: 800; margin-bottom: 0.3rem;
-      background: linear-gradient(90deg, #60a5fa, #a78bfa, #f472b6);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    }
-    .app-subtitle { color: #94a3b8; font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .mood-question { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; color: #f1f5f9; }
-    .mood-buttons { display: flex; gap: 0.8rem; justify-content: center; flex-wrap: wrap; }
-    .mood-btn {
-      width: 130px; height: 130px; border-radius: 20px; border: 2px solid #334155;
-      background: #1e293b; cursor: pointer; transition: all 0.3s;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
-    }
-    .mood-btn:hover { transform: translateY(-5px); }
-    .mood-btn.happy { border-color: #34d399; }
-    .mood-btn.happy:hover { background: rgba(52,211,153,0.1); box-shadow: 0 0 20px rgba(52,211,153,0.2); }
-    .mood-btn.sad { border-color: #60a5fa; }
-    .mood-btn.sad:hover { background: rgba(96,165,250,0.1); box-shadow: 0 0 20px rgba(96,165,250,0.2); }
-    .mood-btn.frustrated { border-color: #fbbf24; }
-    .mood-btn.frustrated:hover { background: rgba(251,191,36,0.1); box-shadow: 0 0 20px rgba(251,191,36,0.2); }
-    .mood-emoji { font-size: 2.2rem; }
-    .mood-label { font-size: 0.85rem; font-weight: 700; color: #cbd5e1; }
-    .result-area { display: none; margin-top: 1.5rem; }
-    .result-area.show { display: block; animation: fadeIn 0.4s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    .tabs { display: flex; gap: 0.4rem; justify-content: center; margin-bottom: 1rem; flex-wrap: wrap; }
-    .tab-btn {
-      padding: 6px 14px; border-radius: 20px; border: 1px solid #334155;
-      background: transparent; color: #94a3b8; font-family: 'Tajawal', sans-serif;
-      font-size: 0.8rem; cursor: pointer; transition: all 0.3s;
-    }
-    .tab-btn.active { background: rgba(96,165,250,0.15); border-color: #60a5fa; color: #60a5fa; }
-    .tab-btn:hover { border-color: #60a5fa; color: #60a5fa; }
-    .content-card {
-      background: #1e293b; border: 1px solid #334155; border-radius: 16px;
-      padding: 1.2rem; margin-bottom: 0.8rem; text-align: right;
-    }
-    .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.6rem; color: #f1f5f9; }
-    .card-text { font-size: 0.88rem; line-height: 1.9; color: #cbd5e1; }
-    .card-badge {
-      display: inline-block; padding: 3px 10px; border-radius: 12px;
-      font-size: 0.72rem; font-weight: 700; margin-bottom: 0.5rem;
-    }
-    .badge-green { background: rgba(52,211,153,0.15); color: #34d399; }
-    .badge-blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
-    .badge-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
-    .badge-pink { background: rgba(244,114,182,0.15); color: #f472b6; }
-    .quiz-option {
-      display: block; width: 100%; padding: 10px 16px; margin: 6px 0;
-      border: 1px solid #334155; border-radius: 10px; background: #0f172a;
-      color: #cbd5e1; font-family: 'Tajawal', sans-serif; font-size: 0.88rem;
-      cursor: pointer; transition: all 0.3s; text-align: right;
-    }
-    .quiz-option:hover { border-color: #60a5fa; }
-    .quiz-option.correct { border-color: #34d399; background: rgba(52,211,153,0.1); color: #34d399; }
-    .quiz-option.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; }
-    .quiz-score { font-size: 0.9rem; color: #60a5fa; margin-top: 0.5rem; font-weight: 700; }
-    .lang-word {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 12px; margin: 4px 0; background: #0f172a; border-radius: 8px;
-      font-size: 0.88rem;
-    }
-    .lang-word .native { color: #60a5fa; font-weight: 700; }
-    .lang-word .meaning { color: #94a3b8; }
-    .back-btn {
-      margin-top: 1rem; padding: 8px 20px; border: 1px solid #334155;
-      border-radius: 10px; background: transparent; color: #94a3b8;
-      font-family: 'Tajawal', sans-serif; font-size: 0.85rem;
-      cursor: pointer; transition: all 0.3s;
-    }
-    .back-btn:hover { border-color: #60a5fa; color: #60a5fa; }
-    .scroll-content { max-height: 60vh; overflow-y: auto; padding-left: 4px; }
-    .scroll-content::-webkit-scrollbar { width: 4px; }
-    .scroll-content::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق المزاج - Mood Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+.container { max-width: 500px; width: 100%; }
+h1 { text-align: center; font-size: 28px; margin-bottom: 8px; color: #e94560; }
+.subtitle { text-align: center; color: #aaa; margin-bottom: 25px; font-size: 14px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; }
+.tab-btn {
+  flex: 1; min-width: 70px; padding: 10px 6px; border: none; border-radius: 12px;
+  font-family: 'Tajawal'; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  background: #16213e; color: #aaa; white-space: nowrap;
+}
+.tab-btn.active { background: #e94560; color: #fff; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Mood Buttons */
+.mood-buttons { display: flex; gap: 12px; margin-bottom: 20px; }
+.mood-btn {
+  flex: 1; padding: 20px 10px; border: 2px solid transparent;
+  border-radius: 16px; font-family: 'Tajawal'; font-size: 16px;
+  cursor: pointer; transition: all 0.3s; text-align: center;
+  background: #16213e; color: #eee;
+}
+.mood-btn:hover { transform: scale(1.05); }
+.mood-btn.selected { border-color: #e94560; background: #1a1a2e; }
+.mood-btn .emoji { font-size: 36px; display: block; margin-bottom: 8px; }
+
+/* Story Card */
+.story-card {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 20px; border-right: 4px solid #e94560;
+  animation: fadeIn 0.5s ease;
+}
+.story-card h3 { color: #e94560; margin-bottom: 10px; font-size: 18px; }
+.story-card p { line-height: 1.8; color: #ccc; font-size: 15px; }
+.next-story-btn {
+  margin-top: 12px; padding: 10px 20px; border: none; border-radius: 10px;
+  background: #e94560; color: #fff; font-family: 'Tajawal'; font-size: 14px;
+  cursor: pointer; transition: all 0.3s;
+}
+.next-story-btn:hover { background: #c73650; }
+
+/* Tracking Section */
+.track-section {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 20px;
+}
+.track-section h3 { color: #e94560; margin-bottom: 15px; }
+.record-btn {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  background: #e94560; color: #fff; font-family: 'Tajawal';
+  font-size: 16px; font-weight: 700; cursor: pointer;
+  transition: all 0.3s; margin-top: 10px;
+}
+.record-btn:hover { background: #c73650; }
+.record-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Stats */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 20px;
+}
+.stat-card {
+  background: #16213e; border-radius: 12px; padding: 15px;
+  text-align: center;
+}
+.stat-card .count { font-size: 28px; font-weight: 700; color: #e94560; }
+.stat-card .label { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+/* Chart */
+.chart-container {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 20px;
+}
+.chart-container canvas { max-height: 200px; }
+
+/* History Table */
+.history-table {
+  width: 100%; border-collapse: collapse; margin-top: 10px;
+}
+.history-table th, .history-table td {
+  padding: 10px; text-align: center; border-bottom: 1px solid #2a2a4a;
+  font-size: 14px;
+}
+.history-table th { color: #e94560; font-weight: 700; }
+.history-table td { color: #ccc; }
+
+/* Quiz Section */
+.quiz-section {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 20px;
+}
+.quiz-section h3 { color: #e94560; margin-bottom: 15px; }
+.quiz-q { margin-bottom: 15px; padding: 15px; background: #1a1a2e; border-radius: 12px; }
+.quiz-q p { margin-bottom: 10px; font-weight: 500; }
+.quiz-option {
+  display: block; width: 100%; padding: 10px; margin: 5px 0;
+  border: 1px solid #2a2a4a; border-radius: 8px; background: transparent;
+  color: #eee; font-family: 'Tajawal'; font-size: 14px; cursor: pointer;
+  text-align: right; transition: all 0.3s;
+}
+.quiz-option:hover { border-color: #e94560; }
+.quiz-option.correct { background: #2d6a4f; border-color: #40916c; }
+.quiz-option.wrong { background: #6b2737; border-color: #e94560; }
+
+/* Games Section */
+.games-header {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 20px; text-align: center;
+}
+.games-header h3 { color: #e94560; margin-bottom: 5px; }
+.games-header p { color: #aaa; font-size: 13px; }
+.points-display {
+  background: linear-gradient(135deg, #e94560, #c73650);
+  border-radius: 12px; padding: 12px; text-align: center;
+  margin-bottom: 20px; font-size: 18px; font-weight: 700;
+}
+
+.game-selector { display: flex; gap: 8px; margin-bottom: 20px; }
+.game-tab {
+  flex: 1; padding: 10px; border: none; border-radius: 10px;
+  font-family: 'Tajawal'; font-size: 13px; font-weight: 700;
+  cursor: pointer; transition: all 0.3s;
+  background: #16213e; color: #aaa;
+}
+.game-tab.active { background: #e94560; color: #fff; }
+.game-panel { display: none; }
+.game-panel.active { display: block; }
+
+/* Word Scramble */
+.scramble-word {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  margin: 20px 0;
+}
+.letter-tile {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; cursor: pointer;
+  transition: all 0.3s; background: #16213e; color: #eee;
+  border: 2px solid #2a2a4a;
+}
+.letter-tile:hover { border-color: #e94560; transform: scale(1.1); }
+.letter-tile.used { opacity: 0.3; pointer-events: none; }
+.answer-area {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  min-height: 50px; margin: 15px 0; padding: 10px;
+  background: #16213e; border-radius: 12px; border: 2px dashed #2a2a4a;
+}
+.check-answer-btn {
+  width: 100%; padding: 12px; border: none; border-radius: 10px;
+  background: #e94560; color: #fff; font-family: 'Tajawal';
+  font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px;
+}
+.game-result {
+  text-align: center; padding: 15px; margin-top: 10px;
+  border-radius: 12px; font-size: 16px; font-weight: 700;
+}
+.game-result.success { background: #2d6a4f; }
+.game-result.fail { background: #6b2737; }
+
+/* Memory Cards */
+.memory-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin: 15px 0;
+}
+.mem-card {
+  aspect-ratio: 1; border-radius: 10px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; text-align: center;
+  padding: 4px; transition: all 0.3s;
+  background: #16213e; color: #eee; border: 2px solid #2a2a4a;
+  word-break: break-word; line-height: 1.3;
+}
+.mem-card.flipped { background: #e94560; border-color: #e94560; }
+.mem-card.matched { background: #2d6a4f; border-color: #40916c; pointer-events: none; }
+.mem-card .card-front { font-size: 24px; }
+
+/* Daily Challenge */
+.challenge-card {
+  background: #16213e; border-radius: 16px; padding: 20px;
+  margin-bottom: 15px; border-right: 4px solid #e94560;
+}
+.challenge-card h4 { color: #e94560; margin-bottom: 10px; }
+.challenge-card p { color: #ccc; margin-bottom: 12px; line-height: 1.6; }
+.challenge-options button {
+  display: block; width: 100%; padding: 10px; margin: 5px 0;
+  border: 1px solid #2a2a4a; border-radius: 8px; background: transparent;
+  color: #eee; font-family: 'Tajawal'; font-size: 14px; cursor: pointer;
+  text-align: right; transition: all 0.3s;
+}
+.challenge-options button:hover { border-color: #e94560; }
+.challenge-options button.correct { background: #2d6a4f; border-color: #40916c; }
+.challenge-options button.wrong { background: #6b2737; border-color: #e94560; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
 </head>
 <body>
-  <div class="app-container">
-    <div class="app-title">✨ مزاجك</div>
-    <div class="app-subtitle">اختر مزاجك الحين وخلنا نساعدك</div>
+<div class="container">
+  <h1>🌙 تطبيق المزاج</h1>
+  <p class="subtitle">قصص إسلامية + تتبع مزاجك + ألعاب تعليمية</p>
 
-    <div id="mainScreen">
-      <div class="mood-question">وش مزاجك الحين؟</div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('mood')">😊 القصص</button>
+    <button class="tab-btn" onclick="showTab('track')">📊 التتبع</button>
+    <button class="tab-btn" onclick="showTab('games')">🎮 ألعاب</button>
+    <button class="tab-btn" onclick="showTab('quiz')">🧠 اختبار</button>
+  </div>
+
+  <!-- Tab 1: Stories -->
+  <div id="tab-mood" class="tab-content active">
+    <div class="mood-buttons">
+      <button class="mood-btn" onclick="selectMood('happy')" id="btn-happy">
+        <span class="emoji">😊</span>سعيد
+      </button>
+      <button class="mood-btn" onclick="selectMood('sad')" id="btn-sad">
+        <span class="emoji">😢</span>حزين
+      </button>
+      <button class="mood-btn" onclick="selectMood('frustrated')" id="btn-frustrated">
+        <span class="emoji">😤</span>محبط
+      </button>
+    </div>
+    <div id="story-area"></div>
+  </div>
+
+  <!-- Tab 2: Tracking -->
+  <div id="tab-track" class="tab-content">
+    <div class="track-section">
+      <h3>📝 سجّل مزاجك اليوم</h3>
       <div class="mood-buttons">
-        <button class="mood-btn happy" onclick="showMood('happy')">
-          <span class="mood-emoji">😊</span><span class="mood-label">سعيد</span>
+        <button class="mood-btn" onclick="selectTrackMood('happy')" id="tbtn-happy">
+          <span class="emoji">😊</span>سعيد
         </button>
-        <button class="mood-btn sad" onclick="showMood('sad')">
-          <span class="mood-emoji">😢</span><span class="mood-label">حزين</span>
+        <button class="mood-btn" onclick="selectTrackMood('sad')" id="tbtn-sad">
+          <span class="emoji">😢</span>حزين
         </button>
-        <button class="mood-btn frustrated" onclick="showMood('frustrated')">
-          <span class="mood-emoji">😤</span><span class="mood-label">طفشان</span>
+        <button class="mood-btn" onclick="selectTrackMood('frustrated')" id="tbtn-frustrated">
+          <span class="emoji">😤</span>محبط
         </button>
       </div>
+      <button class="record-btn" id="record-btn" onclick="recordMood()" disabled>💾 حفظ المزاج</button>
     </div>
 
-    <div id="resultArea" class="result-area">
-      <div class="tabs" id="tabsContainer"></div>
-      <div class="scroll-content" id="contentArea"></div>
-      <button class="back-btn" onclick="goBack()">↩ رجوع للقائمة الرئيسية</button>
+    <div class="stats-grid" id="stats-area">
+      <div class="stat-card"><div class="count" id="happy-count">0</div><div class="label">😊 سعيد</div></div>
+      <div class="stat-card"><div class="count" id="sad-count">0</div><div class="label">😢 حزين</div></div>
+      <div class="stat-card"><div class="count" id="frust-count">0</div><div class="label">😤 محبط</div></div>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="moodChart"></canvas>
+    </div>
+
+    <div class="track-section">
+      <h3>📋 سجل آخر 7 أيام</h3>
+      <table class="history-table">
+        <thead><tr><th>اليوم</th><th>المزاج</th></tr></thead>
+        <tbody id="history-body"></tbody>
+      </table>
     </div>
   </div>
 
-  <script>
-    const moodData = {
-      happy: {
-        tabs: ['قصص إسلامية', 'أحاديث ملهمة', 'نصائح إيجابية'],
-        sections: {
-          'قصص إسلامية': [
-            { badge:'badge-green', badgeText:'قصة تفاؤل', title:'🌟 قصة أبي هريرة والتفاؤل', text:`قال رسول الله ﷺ: "عجبا لأمر المؤمن إن أمره كله خير — إن أصابته سراء شكر فكان خيرا له، وإن أصابته ضراء صبر فكان خيرا له".\n\nكان أبو هريرة رضي الله عنه فقيرا جدا، ذات يوم جاء إلى النبي ﷺ وهو جائع. قال له النبي ﷺ: "يا أبا هريرة، ألا أدلك على شيء إذا فعلته غفر لك ذنبك؟" قال: بلى يا رسول الله. قال: "اغسل الوضوء بين الوضوءين".\n\nوهكذا كان النبي ﷺ يرفع هموم أصحابه بأبسط الكلمات. التفاؤل ليس تجاهل المشاكل — بل هو الثقة بأن الله يكتب في كل شي خيرا.` },
-            { badge:'badge-green', badgeText:'قصة شكر', title:'🌟 قصة عمر بن الخطاب والشكر', text:`ذات ليلة خرج عمر بن الخطاب رضي الله عنه يتفقد أهل المدينة، فسمع صوت امرأة تقول لطفلها:\n\n"نامي يا بني، فإن أمير المؤمنين عمر قد أقام الليل يصلّي". فبكى عمر وقال: "يا رب، هل أنا أهون عندك من هذه المرأة التي تشفي صدرها بك؟"\n\nثم عاد إلى بيته ونام قليلا ثم استيقظ وصلّى. هذا الشكر والتواضع جعل عمر من أعظم القادة في التاريخ.\n\n💡 الدرس: الشكر يزيد البركة، والتواضع يفتح أبواب الرحمة.` },
-            { badge:'badge-green', badgeText:'قصة ثقة بالله', title:'🌟 قصة الصحابي الذي وثق بربه', text:`كان رجل من الأنصار فقيرا، لم يكن عنده إلا تمرة واحدة. جاءه جاراه يطلبان شيئا يأكلانه. أعطاهم التمرة وانصرف جائعا.\n\nفلما دخل بيته وجد الله قد أرسل له هدية من طعام. قال: "هذا من فضل ربي".\n\nالنبي ﷺ سمع بالقصة وقال: "من ترك شيئا لله عوضه الله خيرا منه".\n\n💡 الدرس: عندما تتوكل على الله وتترك الدنيا طمعا في رضاه، يأتيك الخير من حيث لا تحتسب.` },
-            { badge:'badge-green', badgeText:'قصة صبر', title:'🌟 قصة جابر بن عبد الله والصبر', text:`ذات يوم قتل والد جابر بن عبد الله رضي الله عنه في غزوة أحد. ذهب جابر إلى النبي ﷺ يبكي. فأخذه النبي ﷺ بحنان وقال: "إن الله يحب أن تُستعمل آياته عند الكرب".\n\nعلمه النبي ﷺ كيف يصلي على والده وكيف يستغفر له. وبمرور الوقت، أصبح جابر من أكثر الصحابة علما وحكمة.\n\n💡 الدرس: الألم المؤقت يصنع شخصيات قوية تدوم للأبد.` },
-            { badge:'badge-green', badgeText:'قصة أمل', title:'🌟 قصة يوسف عليه السلام والأمل', text:`أُلقي سيدنا يوسف عليه السلام في البئر وهو طفل صغير، ثم بيع عبداً، ثم سُجن ظلماً لسنوات. لكن في كل مرحلة كان يقول لنفسه: "ربّي أعلم بما يفعلون".\n\nوفي النهاية، أصبح عزيز مصر — أقوى رجل في البلاد. لم يكن حظاً، بل كان ثباتاً على الأمل والصبر.\n\n💡 الدرس: لا تحكم على وضعك الحالي بأنه نهايتك — ربما هو بداية أعظم رحلة.` },
-            { badge:'badge-green', badgeText:'قصة ابتسامة', title:'🌟 قصة سعد بن معاذ والابتسامة', text:`كان سعد بن معاذ رضي الله عنه رجلاً شجاعاً ومبتسماً. ذات يوم دخل على النبي ﷺ والنبي ﷺ يبتسم. قال سعد: "يا رسول الله، ما أبشرك وجهك اليوم؟" قال: "جاءني جبريل يخبرني أنك ستدخل الجنة".\n\nفقال سعد: "فهل لي أن أضحك؟" فضحك النبي ﷺ وضحك الصحابة جميعاً.\n\n💡 الدرس: الابتسامة صدقة، والفرح الصادق يعدي الآخرين بالسعادة.` },
-            { badge:'badge-green', badgeText:'قصة كرم', title:'🌟 قصة بلال بن رباح والكرم', text:`كان بلال بن رباح رضي الله عنه مملوكاً يُعذب على دينه. لكنه لم يفقد أماله أبداً. كان يردد "أحد أحد" رغم الضرب.\n\nحتى اشتراه أبو بكر الصديق وأعتقه. ثم أصبح مؤذن الإسلام الأول.\n\nصوت بلال في الفجر كان يحمل رسالة: "الله أكبر" — يعني الله فوق كل شيء.\n\n💡 الدرس: الكرامة الحقيقية ليست في المكانة الاجتماعية — بل في الثبات على الحق.` },
-            { badge:'badge-green', badgeText:'قصة توبة', title:'🌟 قصة مالك بن دينار والتوبة', text:`كان مالك بن دينار شاباً يضيع وقته في اللهو واللعب. ذات يوم رأى رجلاً صالحاً يصلي في مسجد مهجور. تأثر قلبه وبدأ يسأل نفسه: "هل حياتي كلها ستكون هكذا؟"\n\nتوبته كانت صادقة، وأصبح من أعظم العباد في عصره. كتب عنه الناس مئات القصص.\n\n💡 الدرس: لا يوجد وقت متأخر للتغيير. لحظة واحدة من الصدق تكفي لتحويل مسار حياتك.` },
-            { badge:'badge-green', badgeText:'قصة حب', title:'🌟 قصة عائشة وأم سلمة والحب', text:`كانت عائشة وأم سلمة رضي الله عنهما من أفضل النساء في التاريخ. رغم اختلاف شخصيتهما، كنّ يتحاببن ويتعاونن.\n\nعائشة كانت حريصة على العلم، وأم سلمة كانت حريصة على الحكمة. كل واحدة تعلمت من الأخرى.\n\n💡 الدرس: الحب الحقيقي لا يحتاج تشابه تام — يكفي الاحترام المتبادل والرغبة في التعلم من بعضنا.` },
-            { badge:'badge-green', badgeText:'قصة نجاح', title:'🌟 قصة خالد بن الوليد والنجاح', text:`كان خالد بن الوليد رضي الله عنه من أعظم القادة العسكريين في التاريخ. لم يخسر معركة واحدة في حياته!\n\nلكن سر نجاحه لم يكن القوة فقط — كان التخطيط والذكاء والثقة بالله.\n\nقبل كل معركة كان يقول: "لا قوة إلا بالله". وكان يخطط بعناية فائقة.\n\n💡 الدرس: النجاح = تخطيط + عمل + توكل على الله.` }
-          ],
-          'أحاديث ملهمة': [
-            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث التفاؤل', text:`قال رسول الله ﷺ: "لا يحل لمسلم أن يهجر أخاه فوق ثلاث ليال، يلتقيان فيعرض هذا ويعرض هذا، وخيرهما الذي يبدأ بالسلام".\n\nالتفاؤل يبدأ من علاقاتنا مع الناس. ابدأ بالسلام، ابتسم، كن أول من يقدم — ستجد أن السعادة تنتقل كالعدوى الإيجابية.` },
-            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث الرضا', text:`قال رسول الله ﷺ: "إن العجب لعبد يشقى بنفسه، يقول: لو عملت كذا وكذا لكان كذا وكذا. أما إنه ما أصابك لم يكن ليخطئك، وما أخطأك لم يكن ليصيبك".\n\nالرضا بقضاء الله ليس استسلاماً — بل هو ثقة عميقة بأن الله أعلم بما يصلحنا.` },
-            { badge:'badge-blue', badgeText:'حديث نبوي', title:'💎 حديث البشارة', text:`قال رسول الله ﷺ: "إذا مات ابن آدم انقطع عمله إلا من ثلاث: صدقة جارية، أو علم ينتفع به، أو ولد صالح يدعو له".\n\nهذه البشارة تذكرنا أن أثرنا يستمر بعد رحيلنا. كل عمل صالح اليوم يبني مستقبلاً سعيداً.` }
-          ],
-          'نصائح إيجابية': [
-            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: قوة الامتنان', text:`📌 جرّب هذا اليوم:\n• اكتب 3 أشياء تشعر بالامتنان لها\n• قل الحمد لله بصوت عالٍ لكل واحدة\n• لاحظ كيف يتغير مزاجك خلال 10 دقائق\n\nالأبحاث العلمية أثبتت أن ممارسة الامتنان يومياً تزيد السعادة بنسبة 25%. والدين الإسلامي يعلمنا هذا منذ 1400 سنة!` },
-            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: قانون الـ 5 ثواني', text:`📌 قبل ما تفكر كثير في شي سلبي:\n• عد تنازلياً: 5... 4... 3... 2... 1...\n• بعدها افعل أول شي إيجابي يخطر ببالك\n• مثل: ابتسم، اشرب ماء، اقرأ آية قرآنية\n\nهذا يكسر دائرة التفكير السلبي فوراً!` },
-            { badge:'badge-yellow', badgeText:'نصيحة نفسية', title:'🧠 نصيحة: بيئة السعادة', text:`📌 حوّل محيطك:\n• ضع صورة تحفزك بجوار سريرك\n• احذف حسابات تسبب لك قلقاً\n• أضف شخصيات إيجابية في حياتك\n• اقرأ صفحة من القرآن كل صباح\n\nالسعادة تبدأ من البيئة اللي حولك.` }
-          ]
-        }
+  <!-- Tab 3: Games -->
+  <div id="tab-games" class="tab-content">
+    <div class="points-display">⭐ نقاطك: <span id="total-points">0</span></div>
+
+    <div class="game-selector">
+      <button class="game-tab active" onclick="showGame('scramble')">🔤 رتّب الكلمات</button>
+      <button class="game-tab" onclick="showGame('memory')">🃏 بطاقات الذاكرة</button>
+      <button class="game-tab" onclick="showGame('challenge')">⭐ تحدي اليوم</button>
+    </div>
+
+    <!-- Game 1: Word Scramble -->
+    <div id="game-scramble" class="game-panel active">
+      <div class="games-header">
+        <h3>🔤 رتّب الحروف</h3>
+        <p>اضغط على الحروف بالترتيب الصحيح لتكوين الكلمة</p>
+      </div>
+      <div style="text-align:center; margin-bottom:10px;">
+        <span style="color:#aaa; font-size:14px;">الكلمة مرتبطة بـ:</span>
+        <span id="scramble-hint" style="color:#e94560; font-weight:700;"></span>
+      </div>
+      <div class="answer-area" id="scramble-answer"></div>
+      <div class="scramble-word" id="scramble-letters"></div>
+      <button class="check-answer-btn" onclick="checkScramble()">✅ تحقق من الإجابة</button>
+      <button class="check-answer-btn" style="background:#16213e; margin-top:8px;" onclick="nextScrambleWord()">⏭️ كلمة جديدة</button>
+      <div id="scramble-result"></div>
+    </div>
+
+    <!-- Game 2: Memory Cards -->
+    <div id="game-memory" class="game-panel">
+      <div class="games-header">
+        <h3>🃏 بطاقات الذاكرة</h3>
+        <p>اعثر على الأزواج المتطابقة — الحديث مع تفسيره</p>
+      </div>
+      <div style="text-align:center; margin-bottom:10px;">
+        <span style="color:#aaa;">الحركات: </span>
+        <span id="mem-moves" style="color:#e94560; font-weight:700;">0</span>
+      </div>
+      <div class="memory-grid" id="memory-grid"></div>
+      <button class="check-answer-btn" style="margin-top:15px;" onclick="initMemoryGame()">🔄 لعبة جديدة</button>
+    </div>
+
+    <!-- Game 3: Daily Challenge -->
+    <div id="game-challenge" class="game-panel">
+      <div class="games-header">
+        <h3>⭐ تحدي اليوم</h3>
+        <p>أسئلة يومية عن الذكاء الاصطناعي والمعرفة العامة</p>
+      </div>
+      <div id="challenge-area"></div>
+      <button class="check-answer-btn" style="margin-top:15px;" onclick="initChallenge()">🔄 أسئلة جديدة</button>
+    </div>
+  </div>
+
+  <!-- Tab 4: Quiz -->
+  <div id="tab-quiz" class="tab-content">
+    <div class="quiz-section">
+      <h3>🧠 اختبر معلوماتك عن الذكاء الاصطناعي</h3>
+      <div id="quiz-area"></div>
+      <div id="quiz-result" style="text-align:center; margin-top:15px; font-size:18px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ STORIES DATABASE (EXPANDED) ============
+const stories = {
+  happy: [
+    { title: "فضل الشكر", text: "قال النبي ﷺ: «من لا يشكر الناس لا يشكر الله» (رواه مسلم). شكرتك اليوم هي بداية طريق جميل — استمر!" },
+    { title: "رضا القدر", text: "قال تعالى: ﴿وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ﴾ (البقرة: 216). فرحك اليوم نعمة فاستشعرها." },
+    { title: "الابتسامة صدقة", text: "قال ﷺ: «تبسمك في وجه أخيك صدقة» (رواه الترمذي). ابتسامتك اليوم قد تكون سبب فرح شخص آخر!" },
+    { title: "نعم الله لا تُحصى", text: "قال تعالى: ﴿وإن تعدوا نعمة الله لا تحصوها﴾ (إبراهيم: 34). فرحك دليل على نعم كثيرة حولك." },
+    { title: "السعادة في الطاعة", text: "قال ﷺ: «كل عمل ابن آدم له إلا الصوم فإنه لي وأنا أجزي به» (متفق عليه). طاعتك مصدر سعادتك الحقيقية." },
+    { title: "فرحة المؤمن", text: "قال ﷺ: «للمؤمن سروران: سرور عند النعمة، وسرور عند البلاء» (رواه أحمد). استمتع بكل لحظة." },
+    { title: "العلم نور", text: "قال ﷺ: «طلب العلم فريضة على كل مسلم» (رواه ابن ماجه). تعلمك اليوم هو استثمار في دنياك وآخرتك." },
+    { title: "الصلاة رجاء", text: "قال تعالى: ﴿إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ﴾ (العنكبوت: 45). صلاتك مصدر سعادة حقيقية." },
+    { title: "الرزق مضمون", text: "قال ﷺ: «لو أنكم توكلون على الله حق توكله لرزقكم كما يرزق الطير تغدو خماصاً وتروح بطاناً» (رواه الترمذي)." },
+    { title: "حسن الخلق", text: "قال ﷺ: «أكمل المؤمنين إيماناً أحسنهم خلقاً» (رواه أبو داود). حسن خلقك يفرح قلبك ويقرّبك من الله." }
+  ],
+  sad: [
+    { title: "الله قريب", text: "قال تعالى: ﴿وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ﴾ (ق: 16). أنت لست وحدك — الله أقرب إليك مما تتخيل." },
+    { title: "الصبر مفتاح الفرج", text: "قال ﷺ: «عجبا لأمر المؤمن إن أمره كله خير» (رواه مسلم). فرجتك قادمة بإذن الله." },
+    { title: "الدعاء في الشدة", text: "قال ﷺ: «ما يصيب المسلم نصب ولا وصب... إلا كفّر الله بها من سيئاته» (رواه البخاري). ادع الله فهو يستجيب." },
+    { title: "القوة في الضعف", text: "قال ﷺ: «يدفع الله عن العبد بالصدقة والبلاء ما كان ليصيبه» (رواه أحمد). ضعفك اليوم قوة غداً." },
+    { title: "الأمل في وعد الله", text: "قال تعالى: ﴿فَإِنَّ مَعَ الْعُسْرِ يُسْرًا﴾ (الشرح: 5). بعد كل صعوبة يأتي اليسر — ثق بوعد ربك." },
+    { title: "الدموع مقبولة", text: "قال ﷺ: «ما من شيء أشد على الميت من بكاء أهله عليه» لكن دموعك لله مقبولة ومشفعة." },
+    { title: "التفاؤل عبادة", text: "قال ﷺ: «لا يموتن أحدكم إلا وهو يحسن الظن بالله» (رواه مسلم). تفاؤلك هو أفضل دعاء لك." },
+    { title: "راحة القلب", text: "قال ﷺ: «إن في الجسد مضغة إذا صلحت صلح الجسد كله وهي القلب» (متفق عليه). ابدأ براحة قلبك." },
+    { title: "اللجوء إلى الله", text: "قال ﷺ: «اللهم إني أعوذ بك من الهم والحزن والعجز والكسل» (رواه مسلم). هذا الدعاء يريحك." },
+    { title: "الليالي تمر", text: "قال تعالى: ﴿وَلَنَبْلُوَنَّكُم بِشَيْءٍ مِّنَ الْخَوْفِ وَالْجُوعِ﴾ (البقرة: 155). الابتلاء مؤقت والجزاء أبدي." }
+  ],
+  frustrated: [
+    { title: "التوفيق من الله", text: "قال ﷺ: «اللهم لا سهل إلا ما جعلته سهلاً وأنت تجعل الحزن إذا شئت سهلاً». ابدأ من جديد بثقة." },
+    { title: "الفشل خطوة نحو النجاح", text: "قال ﷺ: «المؤمن القوي خير وأحب إلى الله من المؤمن الضعيف» (رواه مسلم). القوة تأتي بعد الصعوبات." },
+    { title: "التوبة باب جديد", text: "قال تعالى: ﴿قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ﴾ (الزمر: 53). كل لحظة فرصة جديدة." },
+    { title: "الصبر جلال", text: "قال ﷺ: «الصبر نور» (رواه مسلم). إحباطك اليوم هو نور بكرة بإذن الله." },
+    { title: "التغيير يبدأ الآن", text: "قال ﷺ: «إن الله يحب إذا عمل أحدكم عملاً أن يتقنه» (رواه البزار). ابدأ صغيراً وتقدم بخطوات." },
+    { title: "الإصرار مفتاح", text: "قال ﷺ: «المسلم الذي يخالط الناس ويصبر على أذاهم خير من الذي لا يخالط الناس ولا يصبر على أذاهم» (رواه النسائي). الاستمرار هو النصر." },
+    { title: "البدء من الصفر", text: "قال ﷺ: «ابدأ بنفسك فتعظها» (رواه الطبراني). لا يهم كم فشلت — المهم أنك تبدأ مرة أخرى." },
+    { title: "الثقة بالنفس", text: "قال ﷺ: «لا حسد إلا في اثنتين: رجل آتاه الله مالاً فسلطه على هلكته في الحق، ورجل آتاه الله الحكمة فهو يقضي بها ويعلمها» (متفق عليه). أنت قادر." },
+    { title: "النجاح يحتاج وقت", text: "قال ﷺ: «إن الأعمال بالنيات وإن لكل امرئ ما نوى» (متفق عليه). نيتك الصادقة ستوصلك لهدفك." },
+    { title: "لا تيأس", text: "قال ﷺ: «لا ينبغي للمؤمن أن يكون كالعصفور يبتلى فلا يأكل ثم يرجع إلى عشه» — بل يصبر ويتحمل." }
+  ]
+};
+
+// ============ QUIZ DATA ============
+const quizData = [
+  { q: "وش الفرق بين AI ضيق و AI عام؟", options: ["ما فيه فرق", "الضيق لمهمة واحدة والعام يفكر مثل الإنسان", "الضيق أسرع"], correct: 1 },
+  { q: "وش تسويه الشبكات العصبية؟", options: ["تحاكي دماغ الإنسان", "تصمم مواقع", "تكتب مقالات"], correct: 0 },
+  { q: "أي أداة تستخدم لتصميم بوستر بسرعة؟", options: ["Excel", "Canva AI", "Notepad"], correct: 1 },
+  { q: "وش أهم مبدأ أخلاقي في AI؟", options: ["السرعة", "العدالة والشفافية", "التكلفة"], correct: 1 },
+  { q: "كيف تبني تطبيق ذكي بدون خبرة برمجية؟", options: ["ما تقدر", "Bubble.io أو Replit", "تحتاج شهادة"], correct: 1 }
+];
+
+// ============ GAME DATA ============
+// Word Scramble
+const scrambleWords = [
+  { word: "صَبْر", hint: "فضيلة إسلامية" },
+  { word: "شُكْر", hint: "عبارة عن الامتنان" },
+  { word: "تَوْبَة", hint: "رجوع إلى الله" },
+  { word: "صَلَاة", hint: "ركن من أركان الإسلام" },
+  { word: "حِلْم", hint: "كظم الغيظ" },
+  { word: "أَمَل", hint: "انتظار الخير" },
+  { word: "قُوَّة", hint: "عكس الضعف" },
+  { word: "نَجَاح", hint: "وصول للهدف" },
+  { word: "رِفْق", hint: "لين في التعامل" },
+  { word: "عِلْم", hint: "مصدر المعرفة" },
+  { word: "تَفَائُل", hint: "انتظار الأفضل" },
+  { word: "إِحْسَان", hint: "عمل الخير" }
+];
+
+// Memory Cards
+const memoryPairs = [
+  { pairId: 1, textA: "تبسمك صدقة", textB: "وجه أخيك" },
+  { pairId: 2, textA: "الصبر", textB: "نور" },
+  { pairId: 3, textA: "مع العسر", textB: "يسر" },
+  { pairId: 4, textA: "طلب العلم", textB: "فريضة" },
+  { pairId: 5, textA: "العلم", textB: "نور" },
+  { pairId: 6, textA: "القلب", textB: "مضغة" }
+];
+
+// Daily Challenge
+const challengeQuestions = [
+  { q: "وش أول لغة برمجة استخدمتها في البرنامج؟", options: ["JavaScript", "Python", "C++", "Java"], correct: 1 },
+  { q: "وش يعني NLP في عالم AI؟", options: ["Natural Language Processing", "New Learning Process", "Network Link Protocol"], correct: 0 },
+  { q: "وش اسم الهيئة السعودية المسؤولة عن البيانات والذكاء الاصطناعي؟", options: ["SDAIA", "STC", "SAMA"], correct: 0 },
+  { q: "وش الفرق بين Machine Learning و Deep Learning؟", options: ["ما فيه فرق", "Deep Learning نوع من ML يستخدم شبكات عميقة", "ML أجدد"], correct: 1 },
+  { q: "وش أفضل طريقة لتعلم البرمجة بالـ AI؟", options: ["تعلم كل شي يدوياً", "استخدم AI كمساعد وتعلّم الأساسيات", "لا تحتاج تتعلم شي"], correct: 1 },
+  { q: "وش المقصود بـ Prompt Engineering؟", options: ["هندسة الأوامر", "كتابة أوامر فعّالة للـ AI", "بناء تطبيقات"], correct: 1 },
+  { q: "أي منصة استخدمناها لنشر التطبيق؟", options: ["Google Play", "GitHub Pages", "App Store"], correct: 1 },
+  { q: "وش الهدف من رؤية 2030 في مجال AI؟", options: ["إلغاء الوظائف", "تطوير اقتصاد رقمي وذكاء اصطناعي", "حظر التكنولوجيا"], correct: 1 }
+];
+
+// ============ STATE ============
+let selectedMood = null;
+let trackMood = null;
+let moodRecords = JSON.parse(localStorage.getItem('moodRecords') || '[]');
+let totalPoints = parseInt(localStorage.getItem('totalPoints') || '0');
+let currentScramble = null;
+let scrambledLetters = [];
+let answerLetters = [];
+let memCards = [];
+let flippedCards = [];
+let memMoves = 0;
+let matchedPairs = 0;
+
+// ============ TABS ============
+function showTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  event.target.classList.add('active');
+  if (tab === 'track') updateTracking();
+  if (tab === 'games') { nextScrambleWord(); initMemoryGame(); initChallenge(); }
+}
+
+// ============ MOOD STORIES ============
+function selectMood(mood) {
+  selectedMood = mood;
+  document.querySelectorAll('#tab-mood .mood-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('btn-' + mood).classList.add('selected');
+  showRandomStory(mood);
+}
+
+function showRandomStory(mood) {
+  const moodStories = stories[mood];
+  const randomStory = moodStories[Math.floor(Math.random() * moodStories.length)];
+  document.getElementById('story-area').innerHTML = `
+    <div class="story-card">
+      <h3>${randomStory.title}</h3>
+      <p>${randomStory.text}</p>
+      <button class="next-story-btn" onclick="showRandomStory('${mood}')">🔄 قصة ثانية</button>
+    </div>
+  `;
+}
+
+// ============ TRACKING ============
+function selectTrackMood(mood) {
+  trackMood = mood;
+  document.querySelectorAll('#tab-track .mood-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('tbtn-' + mood).classList.add('selected');
+  document.getElementById('record-btn').disabled = false;
+}
+
+function recordMood() {
+  if (!trackMood) return;
+  const today = new Date().toISOString().split('T')[0];
+  const existingIndex = moodRecords.findIndex(r => r.date === today);
+  if (existingIndex >= 0) {
+    moodRecords[existingIndex].mood = trackMood;
+  } else {
+    moodRecords.push({ date: today, mood: trackMood });
+  }
+  localStorage.setItem('moodRecords', JSON.stringify(moodRecords));
+  alert('✅ تم حفظ مزاجك!');
+  trackMood = null;
+  document.getElementById('record-btn').disabled = true;
+  document.querySelectorAll('#tab-track .mood-btn').forEach(b => b.classList.remove('selected'));
+  updateTracking();
+}
+
+function updateTracking() {
+  const happyCount = moodRecords.filter(r => r.mood === 'happy').length;
+  const sadCount = moodRecords.filter(r => r.mood === 'sad').length;
+  const frustCount = moodRecords.filter(r => r.mood === 'frustrated').length;
+  document.getElementById('happy-count').textContent = happyCount;
+  document.getElementById('sad-count').textContent = sadCount;
+  document.getElementById('frust-count').textContent = frustCount;
+
+  const last7 = moodRecords.slice(-7);
+  const tbody = document.getElementById('history-body');
+  tbody.innerHTML = '';
+  const dayNames = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const moodEmojis = { happy: '😊', sad: '😢', frustrated: '😤' };
+  last7.forEach(r => {
+    const d = new Date(r.date);
+    const row = `<tr><td>${dayNames[d.getDay()]}</td><td>${moodEmojis[r.mood] || ''} ${r.mood === 'happy' ? 'سعيد' : r.mood === 'sad' ? 'حزين' : 'محبط'}</td></tr>`;
+    tbody.innerHTML += row;
+  });
+  if (last7.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="2" style="color:#666">لم تسجل أي مزاج بعد</td></tr>';
+  }
+  renderChart(last7);
+}
+
+let chartInstance = null;
+function renderChart(records) {
+  const ctx = document.getElementById('moodChart').getContext('2d');
+  if (chartInstance) chartInstance.destroy();
+  const labels = records.map(r => { const d = new Date(r.date); return `${d.getDate()}/${d.getMonth()+1}`; });
+  const data = records.map(r => r.mood === 'happy' ? 3 : r.mood === 'sad' ? 1 : 2);
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'المزاج', data: data, borderColor: '#e94560',
+        backgroundColor: 'rgba(233,69,96,0.1)', fill: true, tension: 0.4,
+        pointBackgroundColor: '#e94560', pointRadius: 5
+      }]
+    },
+    options: {
+      responsive: true, plugins: { legend: { display: false },
+        tooltip: { callbacks: { label: c => ['', '😢 حزين', '😤 محبط', '😊 سعيد'][c.raw] || '' } }
       },
-      sad: {
-        tabs: ['قصص مسلية', 'رسائل محفزة', 'تمارين سريعة'],
-        sections: {
-          'قصص مسلية': [
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 أبو الدرداء وزوجته', text:`كان أبو الدرداء رضي الله عنه يحب العلم كثيراً. ذات ليلة كان يدرس حتى السحر، فجاءه جاره وقال: "يا أبا الدرداء، كم ساعة تقرأ؟!" فقال: "أنا أحب أن أكون مع الله".\n\nثم قال الجار: "لكن زوجتك تحبك أكثر!". فعاد أبو الدرداء لزوجته أم سلمة... لا، أم الدرداء! 😄\n\nوالحق إن هذه القصة تذكرنا بأن التوازن بين العبادة والراحة مهم. لا تنسى تضحك وتسامر عائلتك بعد المذاكرة!` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الحكيم والمجنون', text:`دخل مجنون على ملك فقال: "يا ملك، أنت تملك الأرض لكن لا تملك النوم". قال الملك: "وماذا تريد؟" قال: "أريد أن تعرف أنك مهما جمعت من ذهب، لن يشتري لك ليلة نوم هانئة بدون رضا الله".\n\nثم ضحك المجنون وقال: "وأنا أعيش بسدفة وأنام أفضل منك!"\n\n💡 الحقيقة: السعادة ليست في الكمالية — بل في القناعة والرضا.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الصحابي والفيل', text:`ذات يوم مرّ فيل أمام الصحابة فسأل أحدهم النبي ﷺ: "يا رسول الله، أي الحيوان أقوى؟" قال: "الفيل". قال: "وأيهم أذكى؟" قال: "الإنسان".\n\nفقال الصحابي: "يا رسول الله، لماذا الفيل أقوى وأنا أذكى؟" فأجاب النبي ﷺ بابتسامة: "لأن الله خلق كل شي بحكمة، والقوة بدون عقل خطر، والعقل بدون قوة محدود".\n\n💡 الدرس: كل واحد منا عنده نقاط قوة مختلفة — لا تقارن نفسك بالآخرين!` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الرجل والحمار', text:`كان هناك رجل يمشي في الصحراء معه حماره. مرّ عليهم رجل آخر وقال: "ما أجمل هذا الحمار!" فقال صاحبه: "الحمد لله".\n\nبعد أيام، اختلس الحمار. قال الرجل: "الحمد لله". قال جاره: "كيف الحمد لله وقد فقدت حمارك؟" قال: "ربما كان سيصيبه مكروه وأنا كنت سأتحمل ألم ذلك".\n\nبعد أيام عاد الحمار مع ثلاثة أخرى! قال الرجل: "الحمد لله".\n\n💡 الدرس: لا تدري أيّ يوم خير لك — الحمد لله في كل حال.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 القاضي والسؤال الصعب', text:`دخل رجل على قاضي المدينة وقال: "يا قاضي، هل يمكن أن يكون الإنسان صادقاً وكذاباً في نفس الوقت؟"\n\nفكر القاضي طويلاً ثم قال: "نعم! عندما يقول لصاحبه: أنا كذاب".\n\nفضحك الجميع وقال الرجل: "أنت أذكى مما ظننت!"\n\n💡 الدرس: الفكاهة الذكية تخفف التوتر وتفتح الأبواب المغلقة.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الطفل والخبز', text:`ذات يوم جاء طفل صغير إلى متجر الخبز وسأل: "كم سعر هذا الخبز؟" قال البائع: "ريال واحد". قال الطفل: "أعطيني خبزاً بـ 50 هللة".\n\nاستغرب البائع وقال: "كيف؟" قال الطفل: "لأن أمي قالت لي: لا تنفق أكثر من نصف ريال".\n\nضحك البائع وأعطاؤه الخبز مجاناً وقال: "خذوه مجاناً لأن ذكاءكم يستحق الهدايا".\n\n💡 الدرس: البساطة والبراءة أحياناً تكون أذكى من الحسابات المعقدة.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 المعلم والطالب', text:`سأل طالب معلّمه: "يا أستاذ، كيف أتذكر كل شي أتعلمه؟" قال المعلم: "اكتبه". قال الطالب: "ماذا لو نسيت الكتابة؟" قال المعلم: "اكتب: نسيت الكتابة".\n\nضحك الجميع، لكن الفكرة حقيقية: الكتابة تساعد الذاكرة بشكل كبير!\n\n💡 الدرس: أبسط الطرق هي الأكثر فعالية. لا تعقّد الأمور.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الرجل والظل', text:`كان رجل يشتكي من ظله: "يا ظلي، ليش تتبعني أينما ذهبت؟" ثم فكر وقال: "لكن لو ما كنت موجود، لما عرفني أحد من بعيد!"\n\nضحك لنفسه واستراح.\n\n💡 الدرس: الأشياء اللي نشكو منها أحياناً هي نفسها اللي نحتاجها. حاول تشوف الجانب الآخر.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الصحابي والتميمة', text:`جاء رجل للنبي ﷺ وقال: "يا رسول الله، عندي تميمة أحمي بها نفسي". قال النبي ﷺ: "التمائم تضر ولا تنفع. اعوذ بكلمات الله التامات من شر ما خلق".\n\nفقال الرجل: "يا رسول الله، فماذا أفعل؟" قال: "اقرأ سورة الفلق والناس كل ليلة".\n\nفقال الرجل: "هل تكفي؟" قال: "نعم، فهي كافية لمن وثق بالله".\n\n💡 الدرس: الثقة بالله أقوى من أي حماية بشرية.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 التاجر الفقير', text:`كان تاجر فقير يبيع خبزاً في السوق. ذات يوم جاءه غريب وقال: "يا أخي، أعطني رغيفاً". أعطاه التاجر آخر رغيف عنده.\n\nبعد شهر، جاء الغريب مرة ثانية وقال: "أنا من تجار الشام، سألتك عن رغيف واحد واختبرت قلبك. الآن أريد أن أكون شريكك في التجارة".\n\nوبالفعل أصبحا شركاء ونجحوا.\n\n💡 الدرس: الكرم في أصغر الأمور يفتح أبواباً كبيرة.` },
-            { badge:'badge-blue', badgeText:'قصة ممتعة', title:'😄 الحكاية الطويلة', text:`قال رجل لصديقه: "أعرف حكاية طويلة جداً!" قال الصديق: "أخبرني". قال: "الحكاية هي أنني قلت لك إنها طويلة جداً!".\n\nضحك الاثنان وقال الصديق: "أفضل حكاية قصيرة ومفيدة".\n\n💡 الدرس: الإيجاز فن. لا تطوّل الكلام بدون فائدة.` }
-          ],
-          'رسائل محفزة': [
-            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة لك', text:`🌹 تذكر:\n• كل مشكلة في حياتك هي درس وليس عقوبة\n• الله لا يضع فوق طاقتك\n• الصبر مفتاح الفرج — وهذا وعد من الله\n• كل يوم جديد فرصة جديدة\n\n"فإِنَّ مَعَ الْعُسْرِ يُسْرًا" — سورة الشرح\n\nأنت أقوى مما تعتقد 💪` },
-            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة أمل', text:`🌹 اقرأ هذه الآية 3 مرات بصوت عالٍ:\n\n"وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ"\n— سورة الضحى\n\nهذه الآية نزلت في أصعب لحظة في حياة النبي ﷺ. وإذا كانت للنبي ﷺ، فهي لك أيضاً.\n\nالله وعدك بالرضا — ثق بوعد الله 🤲` },
-            { badge:'badge-pink', badgeText:'رسالة تحفيزية', title:'💪 رسالة شجاعة', text:`🌹 تذكر هذه الحقائق:\n• ٩٩٪ من الناس يمرون بمواقف صعبة — أنت لست وحدك\n• الألم مؤقت لكن القوة اللي تبنيها دائمة\n• كل خطوة صغيرة نحو الأمام هي انتصار\n• الله مع الصابرين — وهذا وعد مؤكد\n\nخذ نفس عميق... الآن... أنت بخير 🌿` }
-          ],
-          'تمارين سريعة': [
-            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين التنفس العميق', text:`📌 جرّب الحين:\n1. خذ نفس عميق من أنفك (عد 4 ثواني)\n2. احبس النفس (عد 4 ثواني)\n3. زفر ببطء من فمك (عد 6 ثواني)\n4. كرّر 5 مرات\n\nهذا يقلل هرمون التوتر فوراً ويهدئ الأعصاب. جرّبه الحين! 🌬️` },
-            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين الامتنان السريع', text:`📌 اكتب بسرعة (حتى 3 أشياء):\n• شيء جميل صار لك اليوم\n• شخص تحبه ويشجعك\n• شيء تتطلع له في الأسبوع الجاي\n\nكتابة الامتنان تنشط مناطق السعادة في الدماغ! ✍️` },
-            { badge:'badge-yellow', badgeText:'تمرين سريع', title:'🏃 تمرين الحركة', text:`📌 قف الحين وافعل:\n• امشِ 5 دقائق في الهواء الطلق\n• تمدد جسمك (ارفع يديك للأعلى)\n• اشرب كوب ماء بارد\n• ابتسم حتى لو مجبر — الابتسامة تخدع الدماغ بأنه سعيد!\n\nالحركة البدنية = مضاد اكتئاب طبيعي 🏃‍♂️` }
-          ]
-        }
-      },
-      frustrated: {
-        tabs: ['لعبة معلومات', 'تعلم لغات', 'نصائح عملية'],
-        sections: {
-          'لعبة معلومات': [
-            { badge:'badge-yellow', badgeText:'لعبة تفاعلية', title:'🎮 اختبار معلومات عامة', isQuiz:true, questions:[
-              { q:'ما هي عاصمة السعودية؟', options:['جدة','الرياض','مكة','الدمام'], correct:1 },
-              { q:'كم عدد سور القرآن الكريم؟', options:['100','110','114','120'], correct:2 },
-              { q:'ما هو أكبر كوكب في المجموعة الشمسية؟', options:['زحل','المشتري','أورانوس','نبتون'], correct:1 },
-              { q:'من هو أول خليفة في الإسلام؟', options:['عمر بن الخطاب','علي بن أبي طالب','أبو بكر الصديق','عثمان بن عفان'], correct:2 },
-              { q:'ما هي أطول سورة في القرآن؟', options:['البقرة','آل عمران','النساء','المائدة'], correct:0 }
-            ]}
-          ],
-          'تعلم لغات': [
-            { badge:'badge-green', badgeText:'🇬🇧 إنجليزي', title:'🇬🇧 5 كلمات إنجليزية مفيدة', text:`<div class="lang-word"><span class="native">Hello</span><span class="meaning">مرحبا</span></div><div class="lang-word"><span class="native">Thank you</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Please</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">I love you</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">Good luck</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 حفظ 5 كلمات يومياً = 1825 كلمة في السنة!</p>` },
-            { badge:'badge-green', badgeText:'🇪🇸 إسباني', title:'🇪🇸 5 كلمات إسبانية مفيدة', text:`<div class="lang-word"><span class="native">Hola</span><span class="meaning">مرحبا</span></div><div class="lang-word"><span class="native">Gracias</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Por favor</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">Te quiero</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">Buena suerte</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 الإسبانية ثاني لغة عالمية — تعلمها يفتح لك فرص كثيرة!</p>` },
-            { badge:'badge-green', badgeText:'🇮🇹 إيطالي', title:'🇮🇹 5 كلمات إيطالية مفيدة', text:`<div class="lang-word"><span class="native">Ciao</span><span class="meaning">مرحبا / وداعاً</span></div><div class="lang-word"><span class="native">Grazie</span><span class="meaning">شكراً</span></div><div class="lang-word"><span class="native">Per favore</span><span class="meaning">من فضلك</span></div><div class="lang-word"><span class="native">Ti amo</span><span class="meaning">أحبك</span></div><div class="lang-word"><span class="native">In bocca al lupo</span><span class="meaning">بالتوفيق</span></div><p style="margin-top:8px;font-size:0.82rem;color:#94a3b8">💡 الإيطالي لغة الفن والموسيقى والطبخ — جميلة جداً!</p>` }
-          ],
-          'نصائح عملية': [
-            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: تحويل الغضب لإنتاج', text:`📌 بدل ما تكون طفشان، حوّل الطاقة:\n• اكتب كل شي يزعجك في ورقة → ثم ارمها\n• افعل تمرين بدني سريع (10 ضغطات)\n• حدد هدف صغير تحققه اليوم\n• اقرأ سورة الإخلاص 3 مرات\n\nالغضب طاقة — المشكلة لما نتركها بدون توجيه. وجهها لشي مفيد!` },
-            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: قاعدة الـ 2 دقيقة', text:`📌 إذا شعرت بالإحباط من مهمة كبيرة:\n• اسأل نفسك: "هل أقدر أفعل جزء منها في دقيقتين؟"\n• لو نعم → ابدأ فوراً\n• غالباً ستكمل أكثر من دقيقتين لأن البداية هي الأصعب\n\nمثال: بدل "أحتاج أكتب تقرير كامل" → "أكتب جملة واحدة فقط"\n\nالبداية الصغيرة تكسر حاجز الخمول! 🚀` },
-            { badge:'badge-yellow', badgeText:'نصيحة عملية', title:'🛠️ نصيحة: تقنية POMODORO', text:`📌 طريقة العمل الذكية:\n• اعمل 25 دقيقة بتركيز كامل\n• استرح 5 دقائق\n• كرّر 4 مرات\n• خذ استراحة طويلة 15-30 دقيقة\n\nهذه الطريقة تستخدمها الشركات الكبرى. جربها اليوم وشوف الفرق! ⏱️` }
-          ]
-        }
+      scales: { y: { beginAtZero: true, max: 3, ticks: { stepSize: 1, callback: v => ['', '😢', '😤', '😊'][v] || '' }, grid: { color: '#2a2a4a' } }, x: { grid: { color: '#2a2a4a' } } }
+    }
+  });
+}
+
+// ============ QUIZ ============
+function initQuiz() {
+  const area = document.getElementById('quiz-area');
+  let html = '';
+  quizData.forEach((q, i) => {
+    html += `<div class="quiz-q"><p>${i+1}. ${q.q}</p>`;
+    q.options.forEach((opt, j) => {
+      html += `<button class="quiz-option" onclick="checkAnswer(this, ${i}, ${j})">${opt}</button>`;
+    });
+    html += '</div>';
+  });
+  area.innerHTML = html;
+}
+
+function checkAnswer(btn, qIndex, optIndex) {
+  const parent = btn.parentElement;
+  const buttons = parent.querySelectorAll('.quiz-option');
+  buttons.forEach(b => b.disabled = true);
+  if (optIndex === quizData[qIndex].correct) {
+    btn.classList.add('correct');
+  } else {
+    btn.classList.add('wrong');
+    buttons[quizData[qIndex].correct].classList.add('correct');
+  }
+  const totalAnswered = document.querySelectorAll('.quiz-option.correct, .quiz-option.wrong').length / 2;
+  if (totalAnswered === quizData.length) {
+    const correctCount = document.querySelectorAll('.quiz-option.correct:not(.wrong)').length;
+    document.getElementById('quiz-result').innerHTML = `نتيجتك: ${correctCount} من ${quizData.length} 🎉`;
+  }
+}
+
+// ============ GAMES ============
+function showGame(game) {
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.game-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('game-' + game).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function addPoints(pts) {
+  totalPoints += pts;
+  localStorage.setItem('totalPoints', totalPoints);
+  document.getElementById('total-points').textContent = totalPoints;
+}
+
+// --- Word Scramble ---
+function nextScrambleWord() {
+  currentScramble = scrambleWords[Math.floor(Math.random() * scrambleWords.length)];
+  answerLetters = [];
+  document.getElementById('scramble-result').innerHTML = '';
+  document.getElementById('scramble-hint').textContent = currentScramble.hint;
+
+  // Shuffle letters
+  const letters = currentScramble.word.split('');
+  scrambledLetters = [...letters].sort(() => Math.random() - 0.5);
+
+  renderScramble();
+}
+
+function renderScramble() {
+  const lettersDiv = document.getElementById('scramble-letters');
+  const answerDiv = document.getElementById('scramble-answer');
+  lettersDiv.innerHTML = '';
+  answerDiv.innerHTML = '';
+
+  scrambledLetters.forEach((l, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile';
+    tile.textContent = l;
+    tile.onclick = () => pickLetter(i);
+    lettersDiv.appendChild(tile);
+  });
+
+  answerLetters.forEach((l, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile';
+    tile.textContent = l;
+    tile.onclick = () => removeLetter(i);
+    answerDiv.appendChild(tile);
+  });
+}
+
+function pickLetter(index) {
+  answerLetters.push(scrambledLetters[index]);
+  scrambledLetters[index] = null;
+  renderScramble();
+}
+
+function removeLetter(index) {
+  const letter = answerLetters.splice(index, 1)[0];
+  const nullIndex = scrambledLetters.indexOf(null);
+  scrambledLetters[nullIndex] = letter;
+  renderScramble();
+}
+
+function checkScramble() {
+  const answer = answerLetters.join('');
+  const resultDiv = document.getElementById('scramble-result');
+  if (answer === currentScramble.word) {
+    resultDiv.innerHTML = '<div class="game-result success">🎉 ممتاز! إجابة صحيحة (+10 نقاط)</div>';
+    addPoints(10);
+  } else {
+    resultDiv.innerHTML = `<div class="game-result fail">❌ حاول مرة ثانية — الإجابة: ${currentScramble.word}</div>`;
+  }
+}
+
+// --- Memory Cards ---
+function initMemoryGame() {
+  memMoves = 0;
+  matchedPairs = 0;
+  flippedCards = [];
+  document.getElementById('mem-moves').textContent = '0';
+
+  // Pick 4 random pairs
+  const selected = [...memoryPairs].sort(() => Math.random() - 0.5).slice(0, 4);
+  const cards = [];
+  selected.forEach(p => {
+    cards.push({ pairId: p.pairId, text: p.textA, matched: false });
+    cards.push({ pairId: p.pairId, text: p.textB, matched: false });
+  });
+  memCards = cards.sort(() => Math.random() - 0.5);
+  renderMemoryGrid();
+}
+
+function renderMemoryGrid() {
+  const grid = document.getElementById('memory-grid');
+  grid.innerHTML = '';
+  memCards.forEach((card, i) => {
+    const div = document.createElement('div');
+    div.className = 'mem-card' + (card.matched ? ' matched' : '') + (flippedCards.includes(i) ? ' flipped' : '');
+    div.textContent = card.matched || flippedCards.includes(i) ? card.text : '?';
+    div.style.fontSize = card.matched || flippedCards.includes(i) ? '11px' : '24px';
+    div.onclick = () => flipCard(i);
+    grid.appendChild(div);
+  });
+}
+
+function flipCard(index) {
+  if (flippedCards.length >= 2) return;
+  if (flippedCards.includes(index)) return;
+  if (memCards[index].matched) return;
+
+  flippedCards.push(index);
+  renderMemoryGrid();
+
+  if (flippedCards.length === 2) {
+    memMoves++;
+    document.getElementById('mem-moves').textContent = memMoves;
+
+    const [i1, i2] = flippedCards;
+    if (memCards[i1].pairId === memCards[i2].pairId) {
+      memCards[i1].matched = true;
+      memCards[i2].matched = true;
+      matchedPairs++;
+      flippedCards = [];
+      setTimeout(renderMemoryGrid, 300);
+      if (matchedPairs === 4) {
+        addPoints(20);
+        setTimeout(() => alert('🎉 أكملت البطاقات! +20 نقطة'), 500);
       }
-    };
-
-    let currentMood = '';
-    let currentTab = 0;
-    let quizScore = 0;
-    let quizAnswered = [];
-
-    function showMood(mood) {
-      currentMood = mood;
-      currentTab = 0;
-      quizScore = 0;
-      quizAnswered = [];
-      document.getElementById('mainScreen').style.display = 'none';
-      const area = document.getElementById('resultArea');
-      area.classList.add('show');
-      renderTabs();
-      renderContent();
+    } else {
+      setTimeout(() => {
+        flippedCards = [];
+        renderMemoryGrid();
+      }, 1000);
     }
+  }
+}
 
-    function renderTabs() {
-      const container = document.getElementById('tabsContainer');
-      const tabs = moodData[currentMood].tabs;
-      container.innerHTML = tabs.map((tab, i) =>
-        `<button class="tab-btn ${i === currentTab ? 'active' : ''}" onclick="switchTab(${i})">${tab}</button>`
-      ).join('');
-    }
+// --- Daily Challenge ---
+function initChallenge() {
+  const area = document.getElementById('challenge-area');
+  const shuffled = [...challengeQuestions].sort(() => Math.random() - 0.5).slice(0, 3);
+  let html = '';
+  shuffled.forEach((q, i) => {
+    html += `<div class="challenge-card"><h4>سؤال ${i+1}</h4><p>${q.q}</p><div class="challenge-options">`;
+    q.options.forEach((opt, j) => {
+      html += `<button onclick="checkChallenge(this, ${j}, ${q.correct})">${opt}</button>`;
+    });
+    html += '</div></div>';
+  });
+  area.innerHTML = html;
+}
 
-    function switchTab(idx) {
-      currentTab = idx;
-      quizScore = 0;
-      quizAnswered = [];
-      renderTabs();
-      renderContent();
-    }
+function checkChallenge(btn, chosen, correct) {
+  const siblings = btn.parentElement.querySelectorAll('button');
+  siblings.forEach(b => b.disabled = true);
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    addPoints(5);
+  } else {
+    btn.classList.add('wrong');
+    siblings[correct].classList.add('correct');
+  }
+}
 
-    function renderContent() {
-      const area = document.getElementById('contentArea');
-      const tabs = moodData[currentMood].tabs;
-      const sectionName = tabs[currentTab];
-      const items = moodData[currentMood].sections[sectionName];
-
-      let html = '';
-      items.forEach(item => {
-        if (item.isQuiz) {
-          html += renderQuiz(item);
-        } else {
-          html += `
-            <div class="content-card">
-              <span class="card-badge ${item.badge}">${item.badgeText}</span>
-              <div class="card-title">${item.title}</div>
-              <div class="card-text">${item.text.replace(/\n/g, '<br>')}</div>
-            </div>`;
-        }
-      });
-      area.innerHTML = html;
-    }
-
-    function renderQuiz(item) {
-      let html = `<div class="content-card">
-        <span class="card-badge ${item.badge}">${item.badgeText}</span>
-        <div class="card-title">${item.title}</div>
-        <div class="quiz-score" id="quizScore">النتيجة: 0 / ${item.questions.length}</div>`;
-
-      item.questions.forEach((q, qi) => {
-        html += `<div style="margin-top:12px" id="q-${qi}">
-          <div style="font-size:0.9rem;font-weight:700;margin-bottom:6px;color:#f1f5f9">${qi + 1}. ${q.q}</div>`;
-        q.options.forEach((opt, oi) => {
-          html += `<button class="quiz-option" id="opt-${qi}-${oi}" onclick="checkAnswer(${qi}, ${oi}, ${q.correct})">${opt}</button>`;
-        });
-        html += `</div>`;
-      });
-
-      html += `</div>`;
-      return html;
-    }
-
-    function checkAnswer(qi, selected, correct) {
-      if (quizAnswered.includes(qi)) return;
-      quizAnswered.push(qi);
-
-      const selectedBtn = document.getElementById(`opt-${qi}-${selected}`);
-      const correctBtn = document.getElementById(`opt-${qi}-${correct}`);
-
-      if (selected === correct) {
-        selectedBtn.classList.add('correct');
-        quizScore++;
-      } else {
-        selectedBtn.classList.add('wrong');
-        correctBtn.classList.add('correct');
-      }
-
-      const options = document.querySelectorAll(`[id^="opt-${qi}-"]`);
-      options.forEach(btn => btn.style.pointerEvents = 'none');
-
-      document.getElementById('quizScore').textContent = `النتيجة: ${quizScore} / ${document.querySelectorAll('.quiz-option').length / 5}`;
-    }
-
-    function goBack() {
-      document.getElementById('mainScreen').style.display = 'block';
-      document.getElementById('resultArea').classList.remove('show');
-    }
-  </script>
+// ============ INIT ============
+document.getElementById('total-points').textContent = totalPoints;
+initQuiz();
+updateTracking();
+</script>
 </body>
 </html>
